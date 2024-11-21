@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predicción de Aves</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 60%;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+        input[type="file"] {
+            margin-top: 20px;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 30px;
+        }
+        .result p {
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Clasificación de Aves</h1>
+    <p>Sube una imagen de un ave para predecir su especie.</p>
+
+    <form id="imageForm" enctype="multipart/form-data">
+        <input type="file" name="image" accept="image/*" required>
+        <br><br>
+        <button type="submit">Subir Imagen</button>
+    </form>
+
+    <div class="result" id="result">
+        <!-- Los resultados de la predicción aparecerán aquí -->
+    </div>
+</div>
+
+<script>
+    document.getElementById('imageForm').onsubmit = async function(event) {
+        event.preventDefault();
+        
+        let formData = new FormData();
+        formData.append("image", document.querySelector('input[type="file"]').files[0]);
+        
+        const response = await fetch('/predict', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const result = await response.json();
+        
+        if (result.error) {
+            document.getElementById('result').innerHTML = `<p>Error: ${result.error}</p>`;
+        } else {
+            document.getElementById('result').innerHTML = `
+                <p>Especie Predicha: ${result.predicted_class}</p>
+                <p>Confianza: ${result.confidence.toFixed(2)}%</p>
+            `;
+        }
+    };
+</script>
+
+</body>
+</html>
